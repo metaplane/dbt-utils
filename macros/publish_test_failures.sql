@@ -8,8 +8,6 @@
     {%- for result in results -%}
       {%- if result.node.resource_type == 'test' -%}
         {%- if result.status == 'error' or result.status == 'fail' -%}
-          -- staging failures only works if the test is configured to store failues — we depend on the ephemeral table referenced
-          -- in the `failures_query` below
           {%- if result.node.config.get('store_failures', False) == True or (should_store_failures() and result.node.config.get('store_failures', False) != False) -%}
             {%- set metaplane_meta = result.node.meta.get("metaplane", { 'publish_failures': false }) -%}
             {%- if metaplane_meta.get('publish_failures') == True -%}
@@ -46,10 +44,9 @@
           encryption = (type = 'SNOWFLAKE_SSE');
 
         grant read,write on stage {{ fully_qualified_stage_name }}
-        to role {{ target.role }}; -- is this needed?
+        to role {{ target.role }};
 
         {% for test in failed_tests %}
-          -- copy directly from failure query results into file
           copy into @{{ fully_qualified_stage_name }}/{{ test.name }}.csv
           from ({{ test.failures_query }})
           file_format = (
@@ -75,7 +72,7 @@
           select get_presigned_url(
             '@{{ fully_qualified_stage_name }}',
             '{{ test.name }}.csv',
-            43200  -- URL expires in 12 hours
+            43200
           );
         {% endset %}
 

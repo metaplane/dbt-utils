@@ -11,8 +11,8 @@
           -- staging failures only works if the test is configured to store failues — we depend on the ephemeral table referenced
           -- in the `failures_query` below
           {%- if result.node.config.get('store_failures', False) == True or (should_store_failures() and result.node.config.get('store_failures', False) != False) -%}
-            {%- set metaplane_meta = result.node.meta.get("metaplane", { 'stage_failures': false }) -%}
-            {%- if metaplane_meta.get('stage_failures') == True -%}
+            {%- set metaplane_meta = result.node.meta.get("metaplane", { 'publish_failures': false }) -%}
+            {%- if metaplane_meta.get('publish_failures') == True -%}
               {%- do failed_tests.append({
                 'name': result.node.name,
                 'unique_id': result.node.unique_id,

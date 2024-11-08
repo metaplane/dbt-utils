@@ -1,4 +1,4 @@
-{% macro stage_test_failures() %}
+{% macro publish_test_failures() %}
 
   {%- if execute -%}
     {%- set stage_name = 'DBT_TEST_FAILURES_' ~ modules.datetime.datetime.now().strftime('%Y%m%d_%H%M%S') -%}

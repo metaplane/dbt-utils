@@ -87,7 +87,7 @@ test.unique_id: {
             {{ log("Stage name: @" ~ fully_qualified_stage_name, info=True) }}
             {{ log("Number of failure files: " ~ failed_tests|length, info=True) }}
 
-            {% do record_test_failures(failure_urls) %}
+            {% do metaplane_utils.record_test_failures(failure_urls) %}
         {%- endif -%}
     {%- endif -%}
 {% endmacro %}

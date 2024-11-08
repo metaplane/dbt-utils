@@ -1,4 +1,4 @@
-{% macro mp_record_test_failures(failure_meta) %}
+{% macro record_test_failures(failure_meta) %}
 
   {%- if execute -%}
 

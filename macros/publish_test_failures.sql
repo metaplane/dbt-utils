@@ -1,4 +1,4 @@
-{% macro stage_test_failures() %}
+{% macro publish_test_failures() %}
 
   {%- if execute -%}
     {%- set stage_name = 'DBT_TEST_FAILURES_' ~ modules.datetime.datetime.now().strftime('%Y%m%d_%H%M%S') -%}
@@ -8,11 +8,20 @@
     {%- for result in results -%}
       {%- if result.node.resource_type == 'test' -%}
         {%- if result.status == 'error' or result.status == 'fail' -%}
-          {%- do failed_tests.append({
-            'name': result.node.name,
-            'unique_id': result.node.unique_id,
-            'failures_query': 'select * from ' ~ result.node.relation_name
-          }) -%}
+          -- staging failures only works if the test is configured to store failues — we depend on the ephemeral table referenced
+          -- in the `failures_query` below
+          {%- if result.node.config.get('store_failures', False) == True or (should_store_failures() and result.node.config.get('store_failures', False) != False) -%}
+            {%- set metaplane_meta = result.node.meta.get("metaplane", { 'publish_failures': false }) -%}
+            {%- if metaplane_meta.get('publish_failures') == True -%}
+              {%- do failed_tests.append({
+                'name': result.node.name,
+                'unique_id': result.node.unique_id,
+                'failures_query': 'select * from ' ~ result.node.relation_name
+              }) -%}
+            {%- endif -%}
+          {%- else -%}
+            {{ log("Not staging failures for test " ~ result.node.name ~ " (" ~ result.node.unique_id ~ ") because it is not configured to store failures", info=True) }}
+          {%- endif -%}
         {%- endif -%}
       {%- endif -%}
     {%- endfor -%}
@@ -87,7 +96,7 @@
       {{ log("Stage name: @" ~ fully_qualified_stage_name, info=True) }}
       {{ log("Number of failure files: " ~ failed_tests|length, info=True) }}
 
-      {% do mp_record_test_failures(failure_urls) %}
+      {% do metaplane_utils.record_test_failures(failure_urls) %}
     {%- endif -%}
   {%- endif -%}
 {% endmacro %}

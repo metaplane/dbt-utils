@@ -1,0 +1,7 @@
+.idea
+target/
+dbt_modules/
+logs/
+dbt_packages/
+dbt-env
+.user.yml

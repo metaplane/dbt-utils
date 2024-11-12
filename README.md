@@ -30,4 +30,5 @@ Ingestion will only happen if you manually opt a test in like so:
 Metaplane will then upload the failed test results into a snowflake stage, generate a pre-signed URL for that stage, 
 and write the URL into the run_results.json file on the adapter response of each run tests.
 
+This macro is currently on supported for Snowflake.
 

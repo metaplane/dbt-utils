@@ -27,6 +27,12 @@ Ingestion will only happen if you manually opt a test in like so:
       - returned
       - completed
 ```
+
+The macro should be called in an [on-end-run](https://docs.getdbt.com/reference/project-configs/on-run-start-on-run-end) hook in the `dbt_project.yml` file like:
+```yaml
+on-run-end:
+  - "{{ metaplane_utils.publish_test_failures() }}"
+```
 Metaplane will then upload the failed test results into a snowflake stage, generate a pre-signed URL for that stage, 
 and write the URL into the run_results.json file on the adapter response of each run tests.
 

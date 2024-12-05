@@ -39,7 +39,7 @@ def push_artifacts_to_metaplane(connection_id: str, api_key: str, project_name: 
         payload = package_artifacts_for_metaplane(connection_id, project_name, job_name)
         
         req = Request(
-            url="https://dev.staging.metaplane.dev/dbt-core/artifacts",
+            url="https://dev.api.metaplane.dev/dbt-core/artifacts",
             data=json.dumps(payload).encode('utf-8'),
             headers={
                 "Accept": "*/*",
